@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    
+    <!-- CSP Policy for secure micro-drift data visualization -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' ws: http:;">
+
+    <title>Chronos Drift Visualizer | Admin Panel</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-color: #0a0a0c;
+            --surface-color: #16161a;
+            --accent-color: #00f2ff;
+            --text-primary: #f0f0f0;
+            --text-secondary: #94a3b8;
+            --error-red: #ff4d4d;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: 'Inter', -apple-system, sans-serif;
+        }
+
+        #root {
+            display: flex;
+            flex-direction: column;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* Initial Loading State */
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            width: 100vw;
+            gap: 20px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(0, 242, 255, 0.1);
+            border-top: 3px solid var(--accent-color);
+            border-radius: 50%;
+            animation: spin 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+
+        .loading-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            letter-spacing: 0.1em;
+            color: var(--accent-color);
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Prevent flash of unstyled content */
+        [v-cloak] { display: none; }
+    </style>
+</head>
+<body>
+    <noscript>
+        <div style="padding: 2rem; text-align: center; color: white;">
+            <h1>JavaScript Required</h1>
+            <p>Chronos Drift Visualizer requires JavaScript to process high-precision NTP telemetry.</p>
+        </div>
+    </noscript>
+
+    <div id="root">
+        <!-- The React application mounts here -->
+        <div class="loading-container" id="initial-loader">
+            <div class="spinner"></div>
+            <div class="loading-text">SYNCHRONIZING ATOMIC CLOCK INTERFACE...</div>
+        </div>
+    </div>
+
+    <!-- Application Bundle -->
+    <script type="module" src="/src/main.tsx"></script>
+
+    <script>
+        // Clean up initial loader once React takes over
+        window.addEventListener('load', () => {
+            const observer = new MutationObserver((mutations) => {
+                if (document.getElementById('root').children.length > 1) {
+                    const loader = document.getElementById('initial-loader');
+                    if (loader) loader.remove();
+                    observer.disconnect();
+                }
+            });
+            observer.observe(document.getElementById('root'), { childList: true });
+        });
+    </script>
+</body>
+</html>
